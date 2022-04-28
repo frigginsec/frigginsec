@@ -24,8 +24,8 @@ description: >- # this means to ignore newlines until "baseurl:"
   This is a blog catalogs  investigations into the cyber threats, phishing emails,
   and scams lurking in the depths of my spam folder.
 baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://frigginsec.github.com" # the base hostname & protocol for your site, e.g. http://example.com
-domain: frigginsec.github.io
+url: "https://blog.frigginsec.com" # the base hostname & protocol for your site, e.g. http://example.com
+domain: blog.frigginsec.com
 twitter_username: frigginsec
 github_username:  frigginsec
 repository: frigginsec/frigginsec
