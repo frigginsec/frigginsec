@@ -24,7 +24,9 @@ BCC: [redacted]
 
 A fun little detail the sender included in this whole scheme was to change the profile picture of their Gmail account to the McAfee logo. Since most mail clients will show the human-friendly name instead of the email address itself, this means that the email as it appeared in my inbox was the McAfee logo next to "McAfee Support" followed by the subject, giving it at least a superficial appearance of being a legitimate email.
 
-Looking at the sender's email, the nam Jonathan Roberts is common enough to not really lead to anything conclusive, and a search for the full email returned no results. This probably another generated account designed to look innocuous enough to pass as a real human sending a legitimate email. 
+![Inbox Screenshot](/assets/images/20220427-001-02.jpg)
+
+Looking at the sender's email, the name Jonathan Roberts is common enough to not really lead to anything conclusive, and a search for the full email returned no results. This probably another generated account designed to look innocuous enough to pass as a real human sending a legitimate email. 
 
 An immediate cue to this being a scam, though, is that my email is blind copied rather than being in the TO field, and the email appears to have been sent to multiple "undisclosed-recipients". Why would more than one person receive an email with what I would assume should be a unique order number?
 
@@ -40,7 +42,7 @@ It's a little obscure, but the `src="cid:ii_l2hsv2pe0"` part of the `img` tag is
 
 In any case, I was able to convert the embedded Base64 content into the original image, and got this:
 
-![Fake McAfee Invoice](/assets/20220427-001-01.png)
+![Fake McAfee Invoice](/assets/images/20220427-001-01.png)
 
 Oh my! I certainly didn't order $500 worth of antivirus software, and certainly not from McAfee! I'll need to call that support number immediately to sort this out! At least, that's what I'm now sure the sender was hoping I would do. (Actually, I *did* call the phone number in the image from a burner phone app, but no one ever picked up. How's that for customer service?)
 
