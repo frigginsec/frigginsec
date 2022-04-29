@@ -30,13 +30,13 @@ The body of the email contained a single, small snippet of HTML:
 
 {% highlight html %}
 <div dir="ltr"><img src="cid:ii_l2hsv2pe0" alt="image.jpeg" width="-27" height="-21"></div>
-{$ endhighlight %}
+{% endhighlight %}
 
 It's a little obscure, but the `src="cid:ii_l2hsv2pe0"' part of the `img` tag is referencing the Content-ID of the embedded `image.jpeg` file in the email. When I viewed the email, the image failed to load, which could either be because the email was sitting in my spam folder or because of the negative values in the width and height parameters. Negative width and hieght values are invalid HTML. Browsers that adhere strictly to W3C standards will not render images with invalid values, while more permissive browsers will just ignore invalid values and render the image in the image's default dimensions. This could potentially be an attempt to selectively target users with non-compliant browsers who would potentially be more vulnerable to a web-based attacks.
 
 In any case, I was able to convert the embedded Base64 content into the original image, and got this:
 
-![Fake McAfee Invoice](/assets/20220407-001-01.png)
+![Fake McAfee Invoice](/assets/20220427-001-01.png)
 
 Oh my! I certainly didn't order $500 worth of antivirus software! I'll need to call that support number immediately to sort this out! At least, that's what I'm now sure the sender was hoping I would do. (Actually, I did call the phone number in the image from a burner phone app, but no one ever picked up. How's that for customer service?)
 
