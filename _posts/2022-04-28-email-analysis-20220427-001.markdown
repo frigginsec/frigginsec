@@ -28,7 +28,7 @@ A fun little detail the sender included in this whole scheme was to change the p
 
 Looking at the sender's email, the name Jonathan Roberts is common enough to not really lead to anything conclusive, and a search for the full email returned no results. This is probably another generated account designed to look innocuous enough to pass as a real human sending a legitimate email. 
 
-An immediate cue to this being a scam, though, is that my email is blind copied rather than being in the TO field, and the email appears to have been sent to multiple "undisclosed-recipients". Why would more than one person receive an email with what I would assume should be a unique order number?
+An immediate clue to this being a scam, though, is that my email is blind copied rather than being in the TO field, and the email appears to have been sent to multiple "undisclosed-recipients". Why would more than one person receive an email with what I would assume should be a unique order number?
 
 The email also contained an inline image, encoded into the email in Base64, simply named "image.jpeg".
 
