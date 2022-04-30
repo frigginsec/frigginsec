@@ -29,6 +29,8 @@ domain: blog.frigginsec.com
 twitter_username: frigginsec
 github_username:  frigginsec
 repository: frigginsec/frigginsec
+show_excerpts: true
+paginate: 5
 
 # Build settings
 #theme: minima
@@ -36,6 +38,7 @@ repository: frigginsec/frigginsec
 plugins:
   - jekyll-feed
   - jekyll-remote-theme
+  - jekyll-paginate
 
 # Exclude from processing.
 # The following items will not be processed, by default.
